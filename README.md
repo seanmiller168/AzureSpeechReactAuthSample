@@ -1,6 +1,6 @@
 # React Speech service sample app
 
-This sample shows how to integrate the Azure Speech service into a sample React application. This sample is simply a fork of the original to demonstrate using the server to validate a client certificate and retrieve a token from the speech service as opposed to passing the speech service key directly. Ideally, the server portion of the code will end up in an Azure function app. 
+This sample shows how to integrate the Azure Speech service into a sample React application. This sample is simply a fork of the original to demonstrate using the server to validate a client certificate and retrieve a token from the speech service as opposed to passing the speech service key directly. Ideally, the server portion of the code will end up in an Azure function app. This is a work in progress.
 
 ## Prerequisites
 
