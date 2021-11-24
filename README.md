@@ -6,6 +6,7 @@ This sample shows how to integrate the Azure Speech service into a sample React 
 
 1. This article assumes that you have an Azure account and Speech service subscription. If you don't have an account and subscription, [try the Speech service for free](https://docs.microsoft.com/azure/cognitive-services/speech-service/overview#try-the-speech-service-for-free).
 1. Ensure you have [Node.js](https://nodejs.org/en/download/) installed.
+1. Clone the repo.
 
 ## Create server and client certificates for client authentication via SSL certificate
 
@@ -47,7 +48,7 @@ SSL_KEY_FILE=<PATH_TO_CLIENT_CERT_KEY>
 
 ## How to run the app
 
-1. Clone this repo, then change directory to the project root and run `npm install` to install dependencies.
+1. Change directory to the project root and run `npm install` to install dependencies.
 1. Add your Azure Speech key and region to the `.env` file, replacing the placeholder text.
 1. To run the Express server and React app together, run `npm run dev`.
 
@@ -102,7 +103,7 @@ const recognizer = new speechsdk.SpeechRecognizer(speechConfig, audioConfig);
 
 ## Speech-to-text from file
 
-To convert speech-to-text from an audio file, run the app and then click **Convert speech to text from an audio file.**. This will open a file browser and allow you to select an audio file. The following function `fileChange` is bound to an event handler that detects the file change. 
+To convert speech-to-text from an audio file, run the app and then click **Convert speech to text from an audio file.**. This will open a file browser and allow you to select an audio file. The following function `fileChange` is bound to an event handler that detects the file change.
 
 ```javascript
 async fileChange(event) {
@@ -145,9 +146,9 @@ const recognizer = new speechsdk.SpeechRecognizer(speechConfig, audioConfig);
 
 ## Token exchange process
 
-This sample application shows an example design pattern for retrieving and managing tokens, a common task when using the Speech JavaScript SDK in a browser environment. A simple Express back-end is implemented in the same project under `server/index.js`, which abstracts the token retrieval process. 
+This sample application shows an example design pattern for retrieving and managing tokens, a common task when using the Speech JavaScript SDK in a browser environment. A simple Express back-end is implemented in the same project under `server/index.js`, which abstracts the token retrieval process.
 
-The reason for this design is to prevent your speech key from being exposed on the front-end, since it can be used to make calls directly to your subscription. By using an ephemeral token, you are able to protect your speech key from being used directly. To get a token, you use the Speech REST API and make a call using your speech key and region. In the Express part of the app, this is implemented in `index.js` behind the endpoint `/api/get-speech-token`, which the front-end uses to get tokens. 
+The reason for this design is to prevent your speech key from being exposed on the front-end, since it can be used to make calls directly to your subscription. By using an ephemeral token, you are able to protect your speech key from being used directly. To get a token, you use the Speech REST API and make a call using your speech key and region. In the Express part of the app, this is implemented in `index.js` behind the endpoint `/api/get-speech-token`, which the front-end uses to get tokens.
 
 ```javascript
 app.get('/api/get-speech-token', async (req, res, next) => {
@@ -175,9 +176,9 @@ app.get('/api/get-speech-token', async (req, res, next) => {
 });
 ```
 
-In the request, you create a `Ocp-Apim-Subscription-Key` header, and pass your speech key as the value. Then you make a request to the **issueToken** endpoint for your region, and an authorization token is returned. In a production application, this endpoint returning the token should be *restricted by additional user authentication* whenever possible. 
+In the request, you create a `Ocp-Apim-Subscription-Key` header, and pass your speech key as the value. Then you make a request to the **issueToken** endpoint for your region, and an authorization token is returned. In a production application, this endpoint returning the token should be *restricted by additional user authentication* whenever possible.
 
-On the front-end, `token_util.js` contains the helper function `getTokenOrRefresh` that is used to manage the refresh and retrieval process. 
+On the front-end, `token_util.js` contains the helper function `getTokenOrRefresh` that is used to manage the refresh and retrieval process.
 
 ```javascript
 export async function getTokenOrRefresh() {
