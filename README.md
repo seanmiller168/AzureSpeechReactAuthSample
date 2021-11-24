@@ -7,6 +7,44 @@ This sample shows how to integrate the Azure Speech service into a sample React 
 1. This article assumes that you have an Azure account and Speech service subscription. If you don't have an account and subscription, [try the Speech service for free](https://docs.microsoft.com/azure/cognitive-services/speech-service/overview#try-the-speech-service-for-free).
 1. Ensure you have [Node.js](https://nodejs.org/en/download/) installed.
 
+## Create server and client certificates for client authentication via SSL certificate
+
+1. Server key and cert:
+openssl req \
+-x509 \
+-newkey rsa:4096 \
+-keyout server_key \
+-out server_cert \
+-nodes \
+-days 365 \
+-subj "/CN=localhost/O=Client\ Certificate\ Demo"
+
+2. Client Signature request:
+openssl req \
+-newkey rsa:4096 \
+-keyout client_key \
+-out client_csr \
+-nodes \
+-days 365 \
+-subj "/CN=Transcribe\ Client"
+
+3. Create Client Certification using server cert as the signing authority (CA):
+openssl x509 \
+-req \
+-in client_csr \
+-CA server_cert \
+-CAkey server_key \
+-out client_cert \
+-set_serial 01 \
+-days 365
+
+## Add the following to .env file to configure HTTPS and the Client Authentication
+
+NODE_OPTIONS=--max-http-header-size=100000
+HTTPS=true
+SSL_CRT_FILE=<PATH_TO_CLIENT_CERT>
+SSL_KEY_FILE=<PATH_TO_CLIENT_CERT_KEY>
+
 ## How to run the app
 
 1. Clone this repo, then change directory to the project root and run `npm install` to install dependencies.

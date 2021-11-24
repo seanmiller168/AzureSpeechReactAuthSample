@@ -3,12 +3,36 @@ const express = require('express');
 const axios = require('axios');
 const bodyParser = require('body-parser');
 const pino = require('express-pino-logger')();
-
+const fs = require('fs');
+const https = require('https');
+const { ConsoleLoggingListener } = require('microsoft-cognitiveservices-speech-sdk/distrib/lib/src/common.browser/ConsoleLoggingListener');
 const app = express();
+
+const options = {
+    key: fs.readFileSync('certs/server_key'),
+    cert: fs.readFileSync('certs/server_cert'),
+    ca: fs.readFileSync('certs/server_cert'),
+    requestCert: true,                
+    rejectUnauthorized: false
+};
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(pino);
 
 app.get('/api/get-speech-token', async (req, res, next) => {
+    console.log('HERE 38');
+    req.log.info('CAN WE SEE THIS');
+
+    if (!req.client.authorized) {
+        return res.status(401).send('Device is not authorized');
+    }
+
+    const cert = req.socket.getPeerCertificate();
+
+    if (cert.subject) {
+        console.log(cert.subject.CN);
+    }
+
     res.setHeader('Content-Type', 'application/json');
     const speechKey = process.env.SPEECH_KEY;
     const speechRegion = process.env.SPEECH_REGION;
@@ -32,6 +56,11 @@ app.get('/api/get-speech-token', async (req, res, next) => {
     }
 });
 
-app.listen(3001, () =>
-    console.log('Express server is running on localhost:3001')
-);
+// app.listen(process.env.BACKEND_PORT, () =>
+//     console.log('Express server is running on localhost:3001')
+// );
+
+const listener = https.createServer(options, app).listen(process.env.BACKEND_PORT, () => {
+    console.log('Express HTTPS server running on localhost:' + listener.address().port);
+    console.log(options);
+});
