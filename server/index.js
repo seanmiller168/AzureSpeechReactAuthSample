@@ -6,6 +6,8 @@ const pino = require('express-pino-logger')();
 const fs = require('fs');
 const https = require('https');
 const { ConsoleLoggingListener } = require('microsoft-cognitiveservices-speech-sdk/distrib/lib/src/common.browser/ConsoleLoggingListener');
+//following line only for local development
+const cors = require('cors');
 const app = express();
 
 const options = {
@@ -19,9 +21,10 @@ const options = {
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(pino);
 
+//following line only for local development
+app.use(cors());
+
 app.get('/api/get-speech-token', async (req, res, next) => {
-    console.log('HERE 38');
-    req.log.info('CAN WE SEE THIS');
 
     if (!req.client.authorized) {
         return res.status(401).send('Device is not authorized');
@@ -56,11 +59,6 @@ app.get('/api/get-speech-token', async (req, res, next) => {
     }
 });
 
-// app.listen(process.env.BACKEND_PORT, () =>
-//     console.log('Express server is running on localhost:3001')
-// );
-
 const listener = https.createServer(options, app).listen(process.env.BACKEND_PORT, () => {
     console.log('Express HTTPS server running on localhost:' + listener.address().port);
-    console.log(options);
 });
