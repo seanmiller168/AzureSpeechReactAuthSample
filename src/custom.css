@@ -10,6 +10,14 @@
     color: #0c6e47;
 }
 
+.fa-stop-circle {
+    color:#FB0202;
+}
+
+.fa-stop-circle:hover {
+    color: #B70D00;
+}
+
 .fa-file-audio {
     color: #FF652F;
 }
@@ -25,6 +33,16 @@
 
 .fas, .fa {
     cursor: pointer;
+}
+
+
+
+.row.input {
+    padding-bottom: 2%;
+}
+
+.column.input {
+    padding-right: 2%;
 }
 
 .background {

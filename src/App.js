@@ -35,21 +35,47 @@ export default class App extends Component {
         const recognizer = new speechsdk.SpeechRecognizer(speechConfig, audioConfig);
 
         this.setState({
-            displayText: 'speak into your microphone...'
+            displayText: 'Speak into your microphone...\n'
         });
 
-        recognizer.recognizeOnceAsync(result => {
-            let displayText;
-            if (result.reason === ResultReason.RecognizedSpeech) {
-                displayText = `RECOGNIZED: Text=${result.text}`
-            } else {
-                displayText = 'ERROR: Speech was cancelled or could not be recognized. Ensure your microphone is working properly.';
-            }
+        recognizer.recognizing = (sender, eventArgs) => {
 
+            let recognizingMessage = eventArgs.result.text;
             this.setState({
-                displayText: displayText
+                displayText: `${recognizingMessage}\n`
             });
-        });
+        };
+
+        recognizer.recognized = (sender, eventArgs) => {
+            if (eventArgs.result.reason === speechsdk.ResultReason.NoMatch) {
+                var notMatchedMessage = `I didn't recognize the text`;
+                this.setState({
+                    displayText: `${this.state.displayText}${notMatchedMessage}\n`
+                });
+            } else {
+                var results = JSON.parse(eventArgs.result.json)['NBest'];
+                var matchedMessage = `Recognized ${eventArgs.result.text}\n`;
+                matchedMessage += `Additional Details\n\n`;
+                results.forEach((additionalDetails) => {
+                    matchedMessage += `Text ${additionalDetails.Display}\n`;
+                    matchedMessage += `Confidence ${additionalDetails.Confidence}\n`;
+                    matchedMessage += `LexicalForm ${additionalDetails.Lexical}\n`;
+                    matchedMessage += `NormalizedForm ${additionalDetails.ITN}\n`;
+                    matchedMessage += `MaskedNormalizedForm ${additionalDetails.MaskedITN}\n`;
+                });
+                this.setState({
+                    displayText: `${this.state.displayText}${matchedMessage}\n`
+                });                
+            }
+        };
+        recognizer.canceled = (sender, eventArgs) => {
+            var cancelledMessage = `Cancelled reason ${eventArgs.reason}`
+            this.setState({
+                displayText: `${this.state.displayText}${cancelledMessage}\n`
+            });
+        };
+        recognizer.startContinuousRecognitionAsync();
+
     }
 
     async fileChange(event) {
@@ -89,18 +115,35 @@ export default class App extends Component {
 
                 <div className="row main-container">
                     <div className="col-6">
-                        <i className="fas fa-microphone fa-lg mr-2" onClick={() => this.sttFromMic()}></i>
-                        Convert speech to text from your mic.
-
-                        <div className="mt-2">
-                            <label htmlFor="audio-file"><i className="fas fa-file-audio fa-lg mr-2"></i></label>
-                            <input 
-                                type="file" 
-                                id="audio-file" 
-                                onChange={(e) => this.fileChange(e)} 
-                                style={{display: "none"}} 
-                            />
-                            Convert speech to text from an audio file.
+                        <div className="row input microphone">
+                            <div className="column input startMicrophone">
+                                <i className="fas fa-microphone fa-lg fa-fw fa-align-center" onClick={() => this.sttFromMic()}></i>  
+                            </div>
+                            <div className="column microphoneText">
+                                Convert speech to text from your mic.
+                            </div>
+                        </div>
+                        <div className="row input stopMicrophone">
+                            <div className="column input stopMicrophone">
+                                <i className="fas fa-stop-circle fa-lg fa-fw fa-align-center" onClick={() => console.log('clicked')}></i>
+                            </div>
+                            <div className="column stopMicrophoneText">
+                                Stop transcribing speech from your mic.
+                            </div>
+                        </div>
+                        <div className="row input audioFile">
+                            <div className="column input audioFile">
+                                <label htmlFor="audio-file"><i className="fas fa-file-audio fa-lg fa-fw fa-align-center"></i></label>
+                                <input 
+                                    type="file" 
+                                    id="audio-file" 
+                                    onChange={(e) => this.fileChange(e)} 
+                                    style={{display: "none"}} 
+                                />
+                            </div>
+                            <div className="column input audioFileText">
+                                Convert speech to text from an audio file.
+                            </div>
                         </div>
                     </div>
                     <div className="col-6 output-display rounded">
